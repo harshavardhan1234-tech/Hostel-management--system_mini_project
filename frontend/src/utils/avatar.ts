@@ -6,14 +6,18 @@
  * and graceful fallback handling for missing or broken image assets.
  */
 
-const API_BASE_URL: string =
-  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
-  'http://localhost:5000/api';
+const RAW_URL: string =
+  (typeof import.meta !== 'undefined' &&
+    import.meta.env &&
+    (import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL)) ||
+  (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.DEV
+    ? 'http://localhost:5000'
+    : 'https://hostel-management-system-mini-project.onrender.com');
 
 /**
- * Backend root origin (e.g. "http://localhost:5000") derived from API_BASE_URL.
+ * Backend root origin (e.g. "https://hostel-management-system-mini-project.onrender.com") derived from VITE_API_URL.
  */
-export const BACKEND_ORIGIN: string = API_BASE_URL.replace(/\/api\/?$/, '');
+export const BACKEND_ORIGIN: string = RAW_URL.replace(/\/+$/, '').replace(/\/api\/?$/, '');
 
 /**
  * Resolves any raw avatar or profile photo URL to an absolute, loadable browser URL.

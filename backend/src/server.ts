@@ -30,7 +30,7 @@ const bootstrap = async (): Promise<void> => {
     startLateReturnMonitoring(30000);
   }
 
-  const server = httpServer.listen(config.port, () => {
+  const server = httpServer.listen(config.port, '0.0.0.0', () => {
     console.log(`=======================================================`);
     console.log(`🚀 ALTS Hostel Portal Backend Server Running`);
     console.log(`🏛️  Institution: Anantha Lakshmi Institute of Technology & Sciences`);

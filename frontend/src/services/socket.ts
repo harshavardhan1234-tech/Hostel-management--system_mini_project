@@ -1,9 +1,13 @@
 import { io, Socket } from 'socket.io-client';
-import { getStoredToken } from './api';
+import { getStoredToken, BACKEND_URL } from './api';
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const RAW_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.DEV ? 'http://localhost:5000' : 'https://hostel-management-system-mini-project.onrender.com');
+
 // Strip trailing /api to connect directly to root Socket.IO server
-const SOCKET_URL = API_BASE.replace(/\/api\/?$/, '');
+const SOCKET_URL = BACKEND_URL || RAW_URL.replace(/\/+$/, '').replace(/\/api\/?$/, '');
 
 let socket: Socket | null = null;
 let isConnecting = false;

@@ -69,20 +69,42 @@ export const socketAuthMiddleware = (
  * Initializes and binds Socket.IO server to the HTTP server instance.
  */
 export const initSocketServer = (httpServer: HttpServer): SocketIOServer => {
-  const allowedOrigins = Array.from(
-    new Set([
-      config.frontendUrl,
-      'http://localhost:5173',
-      'http://127.0.0.1:5173',
-      'http://localhost:5000',
-    ].filter(Boolean))
-  );
+  const configuredOrigins = (config.frontendUrl || '')
+    .split(',')
+    .map((s) => s.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
+  const isOriginAllowed = (origin: string): boolean => {
+    if (!origin) return true;
+    if (config.nodeEnv === 'development') return true;
+    if (config.frontendUrl === '*' || configuredOrigins.includes('*')) return true;
+
+    const cleanOrigin = origin.trim().replace(/\/+$/, '');
+    if (configuredOrigins.includes(cleanOrigin)) return true;
+    if (
+      cleanOrigin === 'http://localhost:5173' ||
+      cleanOrigin === 'http://127.0.0.1:5173' ||
+      cleanOrigin === 'http://localhost:5000'
+    ) {
+      return true;
+    }
+
+    if (
+      /^https:\/\/[a-z0-9-]+\.onrender\.com$/i.test(cleanOrigin) ||
+      /^https:\/\/[a-z0-9-]+\.vercel\.app$/i.test(cleanOrigin) ||
+      /^https:\/\/[a-z0-9-]+\.netlify\.app$/i.test(cleanOrigin)
+    ) {
+      return true;
+    }
+
+    return false;
+  };
 
   io = new SocketIOServer(httpServer, {
     cors: {
       origin: (origin, callback) => {
-        // Allow requests with no origin (e.g. mobile apps, test runners)
-        if (!origin || allowedOrigins.includes(origin) || config.nodeEnv === 'development') {
+        // Allow requests with no origin (e.g. mobile apps, test runners) or matched origins
+        if (!origin || isOriginAllowed(origin)) {
           return callback(null, true);
         }
         return callback(new Error(`CORS blocked for socket connection from ${origin}`));
