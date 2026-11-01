@@ -4,14 +4,19 @@
   "private": true,
   "description": "ALTS Hostel Portal - Anantha Lakshmi Institute of Technology & Sciences",
   "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:frontend": "npm --prefix frontend run dev",
     "dev:backend": "npm --prefix backend run dev",
     "dev:face": "python face_service/service.py",
+    "install:all": "npm --prefix frontend install && npm --prefix backend install",
     "build": "npm run build:frontend && npm run build:backend",
-    "build:frontend": "npm --prefix frontend run build",
-    "build:backend": "npm --prefix backend run build",
+    "build:frontend": "npm --prefix frontend install && npm --prefix frontend run build",
+    "build:backend": "npm --prefix backend install && npm --prefix backend run build",
     "start:backend": "npm --prefix backend run start",
     "provision:user": "npm --prefix backend run provision:user",
     "test:models": "node backend/verify-models.mjs",
